@@ -3,6 +3,7 @@ import styles from "../styles/Home.module.css";
 import Airtable from "airtable";
 import { useState, useEffect } from "react";
 import millify from "millify";
+import { BsArrowRight } from "react-icons";
 import {
   Center,
   Input,
@@ -23,6 +24,9 @@ import {
   Link,
   ExternalLinkIcon,
   Image,
+  Button,
+  ArrowForwardIcon,
+  ArrowBackwardIcon,
 } from "@chakra-ui/react";
 
 export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
@@ -32,29 +36,29 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   const [price_lower_bound, setPriceLowerBound] = useState(100);
   const [price_upper_bound, setPriceUpperBound] = useState(5e3);
   const [is_instock, setInStock] = useState(true);
+  const [next_page_fetcher, setNextPageFetcher] = useState({ fetcher: [] });
   useEffect(() => {
     const input_value = `FIND(UPPER("${input_text}"),UPPER({NAME}))`;
     const price_range = `AND({UNIT COST} >= ${price_lower_bound}, {UNIT COST} <= ${price_upper_bound})`;
     const in_stock = `AND({IN STOCK},${is_instock ? "TRUE()" : "FALSE()"})`;
     const FORMULA = `AND(${input_value}, ${price_range}, ${in_stock})`;
     const query = base("Furniture").select({
-      maxRecords: 6,
+      pageSize: 6,
       view: "All furniture",
       filterByFormula: FORMULA,
     });
     query.eachPage((records, fetchNextPage) => {
       setRecords(records);
+      setNextPageFetcher({ fetcher: fetchNextPage });
     });
   }, [input_text, price_lower_bound, price_upper_bound, is_instock]);
 
   return (
-    <Box mx="5%">
+    <Box>
       <Center mb="2%">
         <VStack>
           <Heading size="lg"> Designer Search Catalog</Heading>
-          <Heading size="md">
-            Find what you are looking for, all in one place!
-          </Heading>
+          <Heading size="md">Find it all in one place!</Heading>
           <Input
             placeholder="Search for a product"
             size="sm"
@@ -94,54 +98,60 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
               }}
             />
           </FormControl>
+          <HStack>
+            <Button colorScheme="teal" variant="outline">
+            ←
+            </Button>
+            <Button colorScheme="teal" variant="outline">
+            →
+            </Button>
+          </HStack>
         </VStack>
       </Center>
       {/* //link to product, image, product name and price. clicking on the product takes you directly to product page */}
-      <Center mb="10%">
-        <Grid templateColumns="repeat(3, 1fr)" gap={342}
-        templateRows='repeat(2, 1fr)' gap={10}
+      <Center
+        mb="10%"
+      >
+        <Grid
+          templateColumns={"repeat(3, 1fr)"}
+          gap={342}
+          templateRows="repeat(2, 1fr)"
+          gap={10}
         >
           {records.map((record, index) => {
             return (
               //the width below is the size of the box holding the image
-              <GridItem key={index} w="100%" h="100%" > 
-                <Box 
-                  maxW="lg"
-                  borderWidth="1px"
-                  borderRadius="md"
-                  overflow="hidden"
-                  center="center"
-                >
-
-              <Stack direction='row'>
-                  <Image 
-                  boxSize='290px'
-                  objectFit='cover'
-                  src={record.get("Images")[0].url} alt="image" />
-                  </Stack>
-
-
-                  <Box p="3">
-                    <Box
-                    
-                      mt="1"
-                      fontWeight="semibold"
-                      as="h4"
-                      lineHeight="tight"
-                      noOfLines={1}
-                    >
-                      {record.get("Name")}
-                    </Box>
-                    <Box>
-                      ${record.get("Unit cost")}
-                    </Box>
-                    <Box>
-                      <Link href={"http://"+record.get("Link")} isExternal>
-                        Link
-                      </Link>
+              <GridItem key={index} w="100%" h="100%">
+                <Link href={"http://" + record.get("Link")} isExternal>
+                  <Box
+                    maxW="lg"
+                    borderWidth="1px"
+                    borderRadius="md"
+                    overflow="hidden"
+                    center="center"
+                  >
+                    <Stack direction="row">
+                      <Image
+                        boxSize="290px"
+                        objectFit="cover"
+                        src={record.get("Images")[0].url}
+                        alt="image"
+                      />
+                    </Stack>
+                    <Box p="3">
+                      <Box
+                        mt="1"
+                        fontWeight="semibold"
+                        as="h4"
+                        lineHeight="tight"
+                        noOfLines={1}
+                      >
+                        {record.get("Name")}
+                      </Box>
+                      <Box>${record.get("Unit cost")}</Box>
                     </Box>
                   </Box>
-                </Box>
+                </Link>
               </GridItem>
             );
           })}
