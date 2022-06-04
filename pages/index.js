@@ -28,7 +28,12 @@ import {
   ArrowForwardIcon,
   ArrowBackwardIcon,
 } from "@chakra-ui/react";
-
+function getLastPage(records){
+  if (records.at(-1)){
+    return records.at(-1)
+  }
+  return []
+}
 export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(BASE_VARIABLE);
   const [records, setRecords] = useState([]); //api call
@@ -36,7 +41,10 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   const [price_lower_bound, setPriceLowerBound] = useState(100);
   const [price_upper_bound, setPriceUpperBound] = useState(5e3);
   const [is_instock, setInStock] = useState(true);
-  const [next_page_fetcher, setNextPageFetcher] = useState({ fetcher: [] });
+  const [current_page, setCurrentPage] = useState(0);
+  const [pages, setPages] = useState({})
+  const [is_done, setDone] = useState(false);
+  const [next_page_fetcher, setNextPageFetcher] = useState({ fetcher: null });
   useEffect(() => {
     const input_value = `FIND(UPPER("${input_text}"),UPPER({NAME}))`;
     const price_range = `AND({UNIT COST} >= ${price_lower_bound}, {UNIT COST} <= ${price_upper_bound})`;
@@ -47,10 +55,12 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
       view: "All furniture",
       filterByFormula: FORMULA,
     });
-    query.eachPage((records, fetchNextPage) => {
-      setRecords(records);
-      setNextPageFetcher({ fetcher: fetchNextPage });
-    });
+    setCurrentPage(0);
+    setPages({});
+    query.eachPage((r, fetchNextPage) => {
+      setRecords([r]);
+      setNextPageFetcher({ fetcher: fetchNextPage});
+    }, ()=>{setDone(true)});
   }, [input_text, price_lower_bound, price_upper_bound, is_instock]);
 
   return (
@@ -99,26 +109,39 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
             />
           </FormControl>
           <HStack>
-            <Button colorScheme="teal" variant="outline">
-            ←
+            <Button colorScheme="teal" variant="outline"
+            onClick={(e)=>{
+              setCurrentPage(current_page - 1);
+            }}
+            disabled={current_page == 0 ? true: false}
+            >
+              ←
             </Button>
-            <Button colorScheme="teal" variant="outline">
-            →
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              disabled={is_done ? true: false}
+              onClick={(e) => {
+                if (!is_done){
+                  next_page_fetcher.fetcher();
+                  setCurrentPage(current_page + 1);
+                }
+              }}
+            >
+              →
             </Button>
           </HStack>
         </VStack>
       </Center>
       {/* //link to product, image, product name and price. clicking on the product takes you directly to product page */}
-      <Center
-        mb="10%"
-      >
+      <Center mb="10%">
         <Grid
           templateColumns={"repeat(3, 1fr)"}
           gap={342}
           templateRows="repeat(2, 1fr)"
           gap={10}
         >
-          {records.map((record, index) => {
+          {getLastPage(records).map((record, index) => {
             return (
               //the width below is the size of the box holding the image
               <GridItem key={index} w="100%" h="100%">
