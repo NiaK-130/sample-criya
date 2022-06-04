@@ -48,8 +48,8 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   }, [input_text, price_lower_bound, price_upper_bound, is_instock]);
 
   return (
-    <div>
-      <Center>
+    <Box mx="5%">
+      <Center mb="2%">
         <VStack>
           <Heading size="lg"> Designer Search Catalog</Heading>
           <Heading size="md">
@@ -97,20 +97,33 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
         </VStack>
       </Center>
       {/* //link to product, image, product name and price. clicking on the product takes you directly to product page */}
-      <Center>
-        <Grid templateColumns="repeat(3, 1fr)" gap={10}>
+      <Center mb="10%">
+        <Grid templateColumns="repeat(3, 1fr)" gap={342}
+        templateRows='repeat(2, 1fr)' gap={10}
+        >
           {records.map((record, index) => {
             return (
-              <GridItem key={index} w="80%" h="20" gap={120}>
-                <Box
-                  maxW="sm"
+              //the width below is the size of the box holding the image
+              <GridItem key={index} w="100%" h="100%" > 
+                <Box 
+                  maxW="lg"
                   borderWidth="1px"
-                  borderRadius="lg"
+                  borderRadius="md"
                   overflow="hidden"
+                  center="center"
                 >
-                  <Image src={record.get("Images")[0].url} alt="image" />
-                  <Box p="6">
+
+              <Stack direction='row'>
+                  <Image 
+                  boxSize='290px'
+                  objectFit='cover'
+                  src={record.get("Images")[0].url} alt="image" />
+                  </Stack>
+
+
+                  <Box p="3">
                     <Box
+                    
                       mt="1"
                       fontWeight="semibold"
                       as="h4"
@@ -134,7 +147,7 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
           })}
         </Grid>
       </Center>
-    </div>
+    </Box>
   );
 }
 
