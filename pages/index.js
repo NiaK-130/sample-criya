@@ -1,17 +1,15 @@
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Airtable from "airtable";
 import { useState, useEffect } from "react";
 import millify from "millify";
 import {
   Center,
-  Square,
-  Circle,
-  Box,
-  Grid,
   Input,
   Stack,
+  Box,
+  Grid,
+  GridItem,
   HStack,
   VStack,
   Switch,
@@ -19,10 +17,12 @@ import {
   RangeSliderTrack,
   RangeSliderFilledTrack,
   RangeSliderThumb,
-  SliderMark,
   FormControl,
   FormLabel,
   Heading,
+  Link,
+  ExternalLinkIcon,
+  Image,
 } from "@chakra-ui/react";
 
 export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
@@ -97,12 +97,42 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
         </VStack>
       </Center>
       {/* //link to product, image, product name and price. clicking on the product takes you directly to product page */}
-      <Center w="90%">
-        <ul>
-          {records.map((record, index) => (
-            <li key={index}>{record.get("Name")}</li>
-          ))}
-        </ul>
+      <Center>
+        <Grid templateColumns="repeat(3, 1fr)" gap={10}>
+          {records.map((record, index) => {
+            return (
+              <GridItem key={index} w="80%" h="20" gap={120}>
+                <Box
+                  maxW="sm"
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                >
+                  <Image src={record.get("Images")[0].url} alt="image" />
+                  <Box p="6">
+                    <Box
+                      mt="1"
+                      fontWeight="semibold"
+                      as="h4"
+                      lineHeight="tight"
+                      noOfLines={1}
+                    >
+                      {record.get("Name")}
+                    </Box>
+                    <Box>
+                      ${record.get("Unit cost")}
+                    </Box>
+                    <Box>
+                      <Link href={"http://"+record.get("Link")} isExternal>
+                        Link
+                      </Link>
+                    </Box>
+                  </Box>
+                </Box>
+              </GridItem>
+            );
+          })}
+        </Grid>
       </Center>
     </div>
   );
