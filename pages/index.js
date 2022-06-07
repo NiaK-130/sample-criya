@@ -2,8 +2,10 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import Airtable from "airtable";
 import { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
 import millify from "millify";
 import { BsArrowRight } from "react-icons";
+import { Flex,Spacer } from "@chakra-ui/layout";
 import {
   Center,
   Input,
@@ -28,12 +30,18 @@ import {
   ArrowForwardIcon,
   ArrowBackwardIcon,
 } from "@chakra-ui/react";
+
+
+
+
 function getLastPage(records){
   if (records.at(-1)){
     return records.at(-1)
   }
   return []
 }
+
+
 export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(BASE_VARIABLE);
   const [records, setRecords] = useState([]); //api call
@@ -64,18 +72,40 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   }, [input_text, price_lower_bound, price_upper_bound, is_instock]);
 
   return (
+    <Flex>
+      <Sidebar/>
     <Box>
-      <Center mb="2%">
+      <Head>
+        <title>McWay Designs</title>
+        <link rel="icon" href="/favicon.ico"/>
+      </Head>
+
+      <Flex mb="2%" >
+        <Box w='1450px'  >
+        
         <VStack>
-          <Heading size="lg"> Designer Search Catalog</Heading>
-          <Heading size="md">Find it all in one place!</Heading>
-          <Input
-            placeholder="Search for a product"
-            size="sm"
-            onChange={(e) => {
-              setInput(e.target.value);
-            }}
-          ></Input>
+        <Spacer/>
+        <Spacer/>
+        <Spacer/>
+        <Spacer/>
+        <Spacer/>
+        <Spacer/>
+
+          <Flex >
+            <Box mb="2%">
+              
+            <Heading mb="2%" align="center" size="lg">McWay Designs</Heading>
+            <Heading mb="2%" w="400px" align="center" size="md"> Designer Search Catalog - Find everything in one place!</Heading>
+            <Input
+              placeholder="Search for a product"
+              size="sm"
+              onChange={(e) => {
+                setInput(e.target.value);
+              }}
+            ></Input>
+            </Box>
+          </Flex>
+
           <HStack w="100%">
             <h1>${millify(price_lower_bound)}</h1>
             <RangeSlider
@@ -132,10 +162,11 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
             </Button>
           </HStack>
         </VStack>
-      </Center>
+        </Box>
+      </Flex>
       {/* //link to product, image, product name and price. clicking on the product takes you directly to product page */}
-      <Center mb="10%">
-        <Grid
+      <Center mb="10%" align="center">
+        <Grid 
           templateColumns={"repeat(3, 1fr)"}
           gap={342}
           templateRows="repeat(2, 1fr)"
@@ -153,7 +184,7 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
                     overflow="hidden"
                     center="center"
                   >
-                    <Stack direction="row">
+                    <Stack direction="row" >
                       <Image
                         boxSize="290px"
                         objectFit="cover"
@@ -181,6 +212,7 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
         </Grid>
       </Center>
     </Box>
+    </Flex>
   );
 }
 
