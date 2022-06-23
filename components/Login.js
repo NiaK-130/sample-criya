@@ -37,7 +37,7 @@ export default function Login(){
                   <Search2Icon w = "100px" h = "100px" color = "white"/>
                 </Box>
             
-                <Heading size="md">Welcome to McWay Designs</Heading>
+                <Heading size="md" fontFamily="cursive" color="gray.700">Welcome to McWay Designs</Heading>
               <Button boxShadow ="md" onClick={() => signInWithGoogle("", {prompt:"select_account"})} > Sign In with Google </Button>
             </Stack>
         </Center>

@@ -14,8 +14,8 @@ export default function SideBar(){
     
     return (
         <Flex
-          bg="blue.100"
-          w="300px" h="130vh"
+          //bg="blue.100"
+          w="300px" h="380vh"
           borderEnd = "1px solid" borderColor="gray.200"
         >
 
@@ -31,12 +31,8 @@ export default function SideBar(){
             <Avatar marginEnd={3} src={user.photoURL}/>
             <Text> {user.displayName} </Text>
         </Flex>
-        <Button isRound w="75px" h="3.2vh" boxShadow ="md" onClick={() =>signOut(auth) } > SignOut </Button>
-
+        <Button h="3.2vh" boxShadow ="md" onClick={() =>signOut(auth) } > SignOut </Button>
          </Flex>
-
-
-
         </Flex>
     )
 }
