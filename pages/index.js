@@ -79,7 +79,6 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   }, [input_text, price_lower_bound, price_upper_bound, is_instock]);
 
   useEffect(()=>{
-    console.log(current_page)
     if (current_page > 0){
       if (next_page_fetcher.fetcher){
         next_page_fetcher.fetcher();
