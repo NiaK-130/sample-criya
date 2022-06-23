@@ -40,17 +40,20 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   const [records, setRecords] = useState([]); //api call
   const [input_text, setInput] = useState(""); //whatever is in the search bar
   const [price_lower_bound, setPriceLowerBound] = useState(0);
-  const [price_upper_bound, setPriceUpperBound] = useState(5e3);
+  const [price_upper_bound, setPriceUpperBound] = useState(1e4);
   const [is_instock, setInStock] = useState(true);
   const [current_page, setCurrentPage] = useState(0);
   const [is_done, setDone] = useState(false);
   const [next_page_fetcher, setNextPageFetcher] = useState({ fetcher: null });
-  // const [query, setQuery] = useState(null)
   
   let getPage = (r, fetchNextPage) => {
-    setRecords(prev_records => ([...prev_records,...r]));      
+    setRecords(prev_records => {
+      return [...prev_records,...r]
+    });      
     setNextPageFetcher({ fetcher: fetchNextPage });
   }
+
+  
 
 
   //run on filter changes
@@ -60,11 +63,12 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
     const in_stock = `AND({IN STOCK},${is_instock ? "TRUE()" : "FALSE()"})`;
     const FORMULA = `AND(${input_value}, ${price_range}, ${in_stock})`;
     setDone(false);
-    let query = base("Furniture").select({
+    const query = base("Furniture").select({
       pageSize: 6,
       view: "All furniture",
       filterByFormula: FORMULA,
     });
+    setRecords([]);
     setCurrentPage(0);
     query.eachPage(
       getPage,
@@ -75,6 +79,7 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
   }, [input_text, price_lower_bound, price_upper_bound, is_instock]);
 
   useEffect(()=>{
+    console.log(current_page)
     if (current_page > 0){
       if (next_page_fetcher.fetcher){
         next_page_fetcher.fetcher();
@@ -209,7 +214,10 @@ export default function Home({ AIRTABLE_API_KEY, BASE_VARIABLE }) {
             <Button
               isDisabled={is_done}
               onClick={() => {
-                setCurrentPage(current_page + 1);
+                setCurrentPage((old_page_number) => {
+                  console.log(old_page_number)
+                  return old_page_number + 1;
+                });
               }}
             >
               {" "}
